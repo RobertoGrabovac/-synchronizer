@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+// TODO: add nodes (processes) and vertices (connections)
 public class AsynchronousNetwork {
     private static final List<Message> networkBuffer = new ArrayList<>();
     private static final Random random = new Random();
@@ -26,5 +27,13 @@ public class AsynchronousNetwork {
         List<Message> messages = new ArrayList<>(networkBuffer);
         networkBuffer.clear();
         return messages;
+    }
+
+    public int size() {
+        return 10; // TODO: fix
+    }
+
+    public boolean areNeighbours(int i, int j) {
+        return true; // TODO: fix
     }
 }

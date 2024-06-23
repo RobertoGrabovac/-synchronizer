@@ -1,8 +1,10 @@
 package com.pmf.synchronizer;
 
+
 import com.pmf.network.Message;
 
-public class GammaSynchronizer {
+// TODO: add parameter k which represents size of clusters inside of network
+public class GammaSynchronizer implements Synchronizer {
     private final AlphaSynchronizer alphaSynchronizer;
     private final BetaSynchronizer betaSynchronizer;
 
@@ -11,24 +13,18 @@ public class GammaSynchronizer {
         this.betaSynchronizer = new BetaSynchronizer();
     }
 
-    public void sendGlobalMessage(String content, String targetCluster) {
-        alphaSynchronizer.sendGlobalMessage(content, targetCluster);
+    @Override
+    public void initialize() {
+
     }
 
-    public void sendLocalMessage(String content, String targetNode) {
-        betaSynchronizer.sendLocalMessage(content, targetNode);
+    @Override
+    public void sendMessage(Message message) {
+
     }
 
-    public void receiveGlobalMessage(Message message) {
-        alphaSynchronizer.receiveGlobalMessage(message);
-    }
+    @Override
+    public void nextPulse() {
 
-    public void receiveLocalMessage(Message message) {
-        betaSynchronizer.receiveLocalMessage(message);
-    }
-
-    public void processMessages() {
-        alphaSynchronizer.processGlobalMessages();
-        betaSynchronizer.processLocalMessages();
     }
 }
