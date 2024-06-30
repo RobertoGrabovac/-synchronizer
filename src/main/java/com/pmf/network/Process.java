@@ -66,7 +66,10 @@ public abstract class Process {
         }
     }
 
+    protected void onSendMessage(Message message) {};
+
     public void sendMessage(Message message) {
+        onSendMessage(message);
         int destId = message.getDestId();
         Socket socket = sockets.get(destId);
         if (socket == null) {
@@ -89,5 +92,13 @@ public abstract class Process {
 
     public static int getPort(int index) {
         return Symbols.ServerPort + index;
+    }
+    
+    protected void myWait() {
+        try {
+            wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
