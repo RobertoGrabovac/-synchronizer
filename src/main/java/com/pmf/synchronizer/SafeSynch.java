@@ -12,6 +12,7 @@ public abstract class SafeSynch extends Process implements Synchronizer {
     int pulse = -1;
     protected int acksNeeded = 0;
     protected Map<Integer, Boolean> unsafe = new HashMap<>(); // Neighbors status
+    // protected HashSet<Integer> neighbours = new HashSet<>();
     protected LinkedList<Message> nextPulseMsgs = new LinkedList<>(); // Messages for next pulse
     protected boolean meSafe;
     MsgHandler prog;
@@ -52,7 +53,7 @@ public abstract class SafeSynch extends Process implements Synchronizer {
         } else if (tag.equals("safe")) {
             while (unsafe.get(src)) myWait();
             unsafe.put(src, false);
-            if (allSafe()) notifyAll();
+            if (neighboursSafe()) notifyAll();
         } else {
             sendMessage(src, "synchAck", "0");
             while (unsafe.get(src)) myWait();
@@ -63,23 +64,35 @@ public abstract class SafeSynch extends Process implements Synchronizer {
 
     @Override
     public void onSendMessage(Message message) {
-        // TODO: Dodati provjeru salje li se susjedu, inace error
+        if (!unsafe.containsKey(message.getDestId())) {
+            System.out.print("Sending message to not neighbour! Proccess" + id + " to " + message.getDestId());
+        }
+
         String tag = message.getTag();
         if (tag.equals("synchAck") || tag.equals("safe"))
             return;
         acksNeeded++;
     }
 
-    public void sendToNeighbors(String tag, String msg) {
-        for (int neighbor : unsafe.keySet()) {
-            sendMessage(neighbor, tag, msg);
+    protected void sendTo(Iterable<Integer> dest, String tag, String msg) {
+        for (int destId : dest) {
+            sendMessage(destId, tag, msg);
         }
     }
 
-    public boolean allSafe() {
-        for (boolean isUnsafe : unsafe.values()) {
+    protected boolean allSafe(Iterable<Integer> dest) {
+        for (Integer destId : dest) {
+            boolean isUnsafe = unsafe.get(destId);
             if (isUnsafe) return false;
         }
         return true;
+    }
+
+    public void sendToNeighbors(String tag, String msg) {
+        sendTo(unsafe.keySet(), tag, msg);
+    }
+
+    public boolean neighboursSafe() {
+        return allSafe(unsafe.keySet());
     }
 }
