@@ -8,7 +8,7 @@ public class AlphaSynch extends SafeSynch {
     }
 
     public static AlphaSynch fromId(int id, int numProcesses) {
-        int neighbors[] = new int[numProcesses];
+        int neighbors[] = new int[numProcesses-1];
         for (int i = 0; i < numProcesses; i++) {
             if (i < id) 
                 neighbors[i] = i;

@@ -12,7 +12,6 @@ public abstract class SafeSynch extends Process implements Synchronizer {
     int pulse = -1;
     protected int acksNeeded = 0;
     protected Map<Integer, Boolean> unsafe = new HashMap<>(); // Neighbors status
-    // protected HashSet<Integer> neighbours = new HashSet<>();
     protected LinkedList<Message> nextPulseMsgs = new LinkedList<>(); // Messages for next pulse
     protected boolean meSafe;
     MsgHandler prog;
@@ -49,28 +48,33 @@ public abstract class SafeSynch extends Process implements Synchronizer {
 
         if (tag.equals("synchAck")) {
             acksNeeded--;
-            if (acksNeeded == 0) notifyAll();
+            notifyAll();
+            // if (acksNeeded == 0) notifyAll();
         } else if (tag.equals("safe")) {
-            while (unsafe.get(src)) myWait();
+            // System.out.println("Putting for " + id + " " + unsafe.get(src));
+            while (!unsafe.get(src)) myWait();
             unsafe.put(src, false);
-            if (neighboursSafe()) notifyAll();
+            notifyAll();
+            // if (neighboursSafe()) notifyAll();
         } else {
             sendMessage(src, "synchAck", "0");
-            while (unsafe.get(src)) myWait();
+            while (!unsafe.get(src)) myWait();
             if (meSafe) nextPulseMsgs.add(message);
             else prog.handleMessage(message);
+            notifyAll();
         }
     }
 
     @Override
     public void onSendMessage(Message message) {
         if (!unsafe.containsKey(message.getDestId())) {
-            System.out.print("Sending message to not neighbour! Proccess" + id + " to " + message.getDestId());
+            System.out.println("Sending message to not neighbour! Proccess " + id + " to " + message.getDestId());
         }
 
         String tag = message.getTag();
-        if (tag.equals("synchAck") || tag.equals("safe"))
+        if (tag.equals("synchAck") || tag.equals("safe")) {
             return;
+        }
         acksNeeded++;
     }
 
@@ -83,7 +87,9 @@ public abstract class SafeSynch extends Process implements Synchronizer {
     protected boolean allSafe(Iterable<Integer> dest) {
         for (Integer destId : dest) {
             boolean isUnsafe = unsafe.get(destId);
-            if (isUnsafe) return false;
+            if (isUnsafe) {
+                return false;
+            }
         }
         return true;
     }

@@ -31,6 +31,8 @@ public class BetaSynch extends SafeSynch {
                 neighbors[i-1] = i;
         }
         int parent = (id-1) / children;
+        if (id == 0)
+            parent = -1;
         int childrenArray[] = getChildrenArray(id, numProcesses, children);
         return new BetaSynch(id, numProcesses, neighbors, childrenArray, parent);
     }

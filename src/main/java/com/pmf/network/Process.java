@@ -60,7 +60,7 @@ public abstract class Process {
         try {
             Socket socket = new Socket(Symbols.ServerHost, destPort);
             sockets.put(destId, socket);
-            System.out.println("Process " + id + " connected to process " + destId);
+            // System.out.println("Process " + id + " connected to process " + destId);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,9 +96,11 @@ public abstract class Process {
     
     protected void myWait() {
         try {
+            // Thread.sleep(10);
             wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        notifyAll();
     }
 }

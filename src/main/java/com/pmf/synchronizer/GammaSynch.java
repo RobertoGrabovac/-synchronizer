@@ -42,9 +42,11 @@ public class GammaSynch extends BetaSynch {
             // If root, add other roots to not cluster neighbours
             int numberOfRoots = (numProcesses + clusterSize - 1) / clusterSize;
             notClusterNeighbours = new int[numberOfRoots - 1];
-            for (int i = 0; i < numProcesses; i += clusterSize) {
-                if (i != id)
-                    notClusterNeighbours[i] = i;
+            for (int i = 0; i < numberOfRoots; i ++) {
+                if (i * clusterSize < id)
+                    notClusterNeighbours[i] = i * clusterSize;
+                if (i * clusterSize > id)
+                    notClusterNeighbours[i-1] = i * clusterSize;
             }
             parent = -1;
         } else {
