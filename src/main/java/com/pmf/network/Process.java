@@ -25,7 +25,7 @@ public abstract class Process {
             serverSocket = new ServerSocket(port);
             System.out.println("Process " + id + " listening on port " + port);
         } catch (IOException e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
 
         new Thread(this::acceptConnections).start();
@@ -37,7 +37,7 @@ public abstract class Process {
                 Socket socket = serverSocket.accept();
                 new Thread(() -> handleConnection(socket)).start();
             } catch (IOException e) {
-                // e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -57,12 +57,25 @@ public abstract class Process {
 
     protected void connectTo(int destId) {
         int destPort = getPort(destId);
-        try {
-            Socket socket = new Socket(Symbols.ServerHost, destPort);
-            sockets.put(destId, socket);
-            // System.out.println("Process " + id + " connected to process " + destId);
-        } catch (IOException e) {
-            e.printStackTrace();
+        int attempts = 0;
+
+        while (attempts < Symbols.MaxRetries) {
+            try {
+                Socket socket = new Socket(Symbols.ServerHost, destPort);
+                sockets.put(destId, socket);
+                return;
+            } catch (IOException e) {
+                attempts++;
+                if (attempts >= Symbols.MaxRetries) {
+                    e.printStackTrace();
+                } else {
+                    try {
+                        Thread.sleep(Symbols.ReconnectWait);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
         }
     }
 

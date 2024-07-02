@@ -57,14 +57,23 @@ public class TestSynch implements MsgHandler{
     }
 
     public static void main(String[] args) {
-        int numProcesses = 9;
-        SynchTask[] processes = new SynchTask[numProcesses];
-        for (int i = 0; i < numProcesses; i++) {
-            processes[i] = new SynchTask(new TestSynch(i, numProcesses, 3));
+        int numProcesses = 4;
+        int clusterSize = 2;
+        if (args.length == 0) {
+            SynchTask[] processes = new SynchTask[numProcesses];
+            for (int i = 0; i < numProcesses; i++) {
+                processes[i] = new SynchTask(new TestSynch(i, numProcesses, clusterSize));
+            }
+    
+            ExecutorService executor = Executors.newCachedThreadPool();
+            for (SynchTask process : processes)
+                executor.execute(process);
+        } else {
+            // Pokrenuti s:
+            // java -XX:+ShowCodeDetailsInExceptionMessages -cp C:\Users\Rango\Projects\Gamma-Synchronizer\target\classes com.pmf.synchronizer.TestSynch <broj_procesa>
+            int id = Integer.parseInt(args[0]);
+            TestSynch test = new TestSynch(id, numProcesses, clusterSize);
+            test.run();
         }
-
-        ExecutorService executor = Executors.newCachedThreadPool();
-        for (SynchTask process : processes)
-            executor.execute(process);
     }
 }
