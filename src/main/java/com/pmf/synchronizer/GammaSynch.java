@@ -18,6 +18,30 @@ public class GammaSynch extends BetaSynch {
         }
         notClusterNeighbours.addAll(unsafe.keySet());
         notClusterNeighbours.removeAll(this.clusterNeighbours);
+        // printSelf();
+    }
+
+    public void printSelf() {
+        System.out.print("Gamma " + id + " parent " + parent + " children " );
+        for (Object elem : children) {
+            System.out.print(elem + " ");
+        }
+        System.out.println();
+        System.out.print("  Neighs ");
+        for (Object elem : unsafe.keySet()) {
+            System.out.print(elem + " ");
+        }
+        System.out.println();
+        System.out.print("  ClusterNeighs ");
+        for (Object elem : clusterNeighbours) {
+            System.out.print(elem + " ");
+        }
+        System.out.println();
+        System.out.print("  NotClusterNeighs ");
+        for (Object elem : notClusterNeighbours) {
+            System.out.print(elem + " ");
+        }
+        System.out.println();
     }
 
     public static GammaSynch fromId(int id, int numProcesses, int clusterSize) {
@@ -30,7 +54,7 @@ public class GammaSynch extends BetaSynch {
 
         // Wether it is root or not, add all nodes inside the tree to 
         // cluster neighbours
-        int clusterNeighbours[] = new int[thisClusterSize];
+        int clusterNeighbours[] = new int[thisClusterSize - 1];
         for (int i = 0; i < thisClusterSize; i++) {
             if (i < inClusterId)
                 clusterNeighbours[i] = i + thisClusterRoot;
@@ -42,11 +66,13 @@ public class GammaSynch extends BetaSynch {
             // If root, add other roots to not cluster neighbours
             int numberOfRoots = (numProcesses + clusterSize - 1) / clusterSize;
             notClusterNeighbours = new int[numberOfRoots - 1];
-            for (int i = 0; i < numberOfRoots; i ++) {
-                if (i * clusterSize < id)
+            for (int i = 0; i < numberOfRoots; i++) {
+                if (i * clusterSize < id) {
                     notClusterNeighbours[i] = i * clusterSize;
-                if (i * clusterSize > id)
+                }
+                if (i * clusterSize > id) {
                     notClusterNeighbours[i-1] = i * clusterSize;
+                }
             }
             parent = -1;
         } else {

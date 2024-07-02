@@ -8,8 +8,8 @@ import java.util.Set;
 import com.pmf.network.Message;
 
 public class BetaSynch extends SafeSynch {
-    private final Set<Integer> children = new HashSet<>();
-    private final int parent;
+    protected final Set<Integer> children = new HashSet<>();
+    protected final int parent;
     
     public BetaSynch(int id, int numProcesses, int[] neighbors, int[] children, int parent) {
         super(id, numProcesses, neighbors);

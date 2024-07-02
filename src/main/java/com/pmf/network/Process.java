@@ -25,7 +25,7 @@ public abstract class Process {
             serverSocket = new ServerSocket(port);
             System.out.println("Process " + id + " listening on port " + port);
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         new Thread(this::acceptConnections).start();
@@ -37,7 +37,7 @@ public abstract class Process {
                 Socket socket = serverSocket.accept();
                 new Thread(() -> handleConnection(socket)).start();
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
     }

@@ -57,10 +57,10 @@ public class TestSynch implements MsgHandler{
     }
 
     public static void main(String[] args) {
-        int numProcesses = 4;
+        int numProcesses = 9;
         SynchTask[] processes = new SynchTask[numProcesses];
         for (int i = 0; i < numProcesses; i++) {
-            processes[i] = new SynchTask(new TestSynch(i, numProcesses, 2));
+            processes[i] = new SynchTask(new TestSynch(i, numProcesses, 3));
         }
 
         ExecutorService executor = Executors.newCachedThreadPool();
