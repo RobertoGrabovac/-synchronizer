@@ -101,4 +101,8 @@ public abstract class SafeSynch extends Process implements Synchronizer {
     public boolean neighboursSafe() {
         return allSafe(unsafe.keySet());
     }
+
+    public boolean isNeighbor(int id) {
+        return unsafe.containsKey(id);
+    }
 }

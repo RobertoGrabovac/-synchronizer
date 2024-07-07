@@ -10,6 +10,7 @@ public class SynchBfsTree implements MsgHandler {
     int myId;
     SafeSynch synch; 
     boolean isRoot;
+    boolean isSent;
     int numProcesses;
  
     public SynchBfsTree(int myId, SafeSynch synch, boolean isRoot, int numProcesses) { 
@@ -17,6 +18,7 @@ public class SynchBfsTree implements MsgHandler {
         this.synch = synch;
         this.isRoot = isRoot; 
         this.numProcesses = numProcesses;
+        this.isSent = false;
     }
 
     public void run() { 
@@ -29,7 +31,16 @@ public class SynchBfsTree implements MsgHandler {
         for (int pulse = 0; pulse < numProcesses; pulse++) { 
             if ((pulse == 0) && isRoot) { 
                 synch.sendToNeighbors("invite", Integer.toString(level + 1));
-            } 
+                isSent = true;
+            } else {
+                if (!isSent && parent != -1) {
+                    System.out.println(myId + " is at level " + level);
+                    for (int i = 0; i < numProcesses; i++) 
+                        if (synch.isNeighbor(i) && (i != parent)) 
+                            synch.sendMessage(i, "invite", Integer.toString(level + 1));
+                    isSent = true;
+                }
+            }
             synch.nextPulse();
         } 
     } 
@@ -39,9 +50,7 @@ public class SynchBfsTree implements MsgHandler {
         if (message.getTag().equals("invite")) { 
             if (parent == -1) { 
                 parent = message.getSrcId(); 
-                level = message.getMessageInt(); 
-                System.out.println(myId + " is at level " + level);
-                synch.sendToNeighbors("invite", Integer.toString(level + 1));
+                level = message.getMessageInt();
             } 
         } 
     } 

@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM Check if the argument (number of processes) is provided
 if "%1"=="" (
-    echo Usage: %0 number_of_processes
+    echo Usage: %0 number_of_processes %1 cluster_size %2 root_id 
     exit /b 1
 )
 

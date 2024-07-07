@@ -18,7 +18,7 @@ public class GammaSynch extends BetaSynch {
         }
         notClusterNeighbours.addAll(unsafe.keySet());
         notClusterNeighbours.removeAll(this.clusterNeighbours);
-        // printSelf();
+        printSelf();
     }
 
     public void printSelf() {
