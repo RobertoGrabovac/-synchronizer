@@ -1,58 +1,48 @@
 package com.pmf;
 
-// import com.pmf.network.AsynchronousNetwork;
-// import com.pmf.network.Message;
-// import com.pmf.synchronizer.Synchronizer;
+import com.pmf.network.Message;
+import com.pmf.network.MsgHandler;
+import com.pmf.synchronizer.SafeSynch;
 
-// import java.util.stream.IntStream;
+public class SynchBfsTree implements MsgHandler {
+    int parent = -1;
+    int level; 
+    int myId;
+    SafeSynch synch; 
+    boolean isRoot;
+    int numProcesses;
+ 
+    public SynchBfsTree(int myId, SafeSynch synch, boolean isRoot, int numProcesses) { 
+        this.myId = myId;
+        this.synch = synch;
+        this.isRoot = isRoot; 
+        this.numProcesses = numProcesses;
+    }
 
-// // TODO: defining clusters logic
-public class SynchBfsTree {
-//     int parent = -1;
-//     int level;
-//     int id;
-//     Synchronizer synchronizer;
-//     AsynchronousNetwork asynchronousNetwork;
+    public void run() { 
+        if (isRoot) { 
+            parent = myId;
+            level = 0; 
+        } 
+        synch.initialize(this);
 
-//     public SynchBfsTree(AsynchronousNetwork asynchronousNetwork, Synchronizer initS, int id) {
-//         this.asynchronousNetwork = asynchronousNetwork;
-//         this.synchronizer = initS;
-//         this.id = id;
-//     }
+        for (int pulse = 0; pulse < numProcesses; pulse++) { 
+            if ((pulse == 0) && isRoot) { 
+                synch.sendToNeighbors("invite", Integer.toString(level + 1));
+            } 
+            synch.nextPulse();
+        } 
+    } 
 
-//     public void initiate() {
-//         if (id == 0) {
-//             parent = 0; // node (process) with id = 0 is a root of BFS tree by definition
-//             level = 0;
-//         }
-
-//         synchronizer.initialize();
-
-//         int networkSize = asynchronousNetwork.size();
-//         IntStream.range(0, networkSize).forEach(pulse -> { //TODO: check if we need this line of code
-//             if (pulse == 0 && id == 0) {
-//                 IntStream.range(0, networkSize)
-//                         .filter(i -> asynchronousNetwork.areNeighbours(id, i))
-//                         .forEach(i -> synchronizer.sendMessage(new Message(id, i, "invite", level + 1)));
-//             }
-//             synchronizer.nextPulse();
-//         });
-//     }
-
-//     public synchronized void handleMsg(Message message) {
-//         if (unvisitedNodeInvited(message)) {
-//             parent = message.src();
-//             level = message.content();
-//             System.out.println(id + " is at level " + level);
-
-//             IntStream.range(0, asynchronousNetwork.size())
-//                     .filter(i -> asynchronousNetwork.areNeighbours(id, i) && i != message.src())
-//                     .forEach(i -> synchronizer.sendMessage(new Message(id, i, "invite", level + 1)));
-//         }
-//     }
-
-//     private boolean unvisitedNodeInvited(Message message) {
-//         return "invite".equals(message.tag()) && parent == -1;
-//     }
-
+    @Override
+    public void handleMessage(Message message) { 
+        if (message.getTag().equals("invite")) { 
+            if (parent == -1) { 
+                parent = message.getSrcId(); 
+                level = message.getMessageInt(); 
+                System.out.println(myId + " is at level " + level);
+                synch.sendToNeighbors("invite", Integer.toString(level + 1));
+            } 
+        } 
+    } 
 }
